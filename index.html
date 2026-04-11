@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Repostería</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <img src="logo.png" alt="Logo" class="sidebar-logo">
+                    <div class="sidebar-brand-text">
+                        <span class="sidebar-brand-name">Mi Repostería</span>
+                        <span class="sidebar-brand-tagline">Gestión artesanal</span>
+                    </div>
+                </div>
+                <button class="sidebar-close" id="sidebarClose" aria-label="Cerrar menú">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <p class="nav-section-label">Principal</p>
+                <a href="#" class="nav-item active" data-section="dashboard">
+                    <i data-lucide="layout-dashboard" class="nav-icon"></i>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-section="quoter">
+                    <i data-lucide="calculator" class="nav-icon"></i>
+                    <span class="nav-text">Cotizador</span>
+                </a>
+
+                <p class="nav-section-label">Catálogo</p>
+                <a href="#" class="nav-item" data-section="recipes">
+                    <i data-lucide="book-open" class="nav-icon"></i>
+                    <span class="nav-text">Recetas</span>
+                </a>
+                <a href="#" class="nav-item" data-section="ingredients">
+                    <i data-lucide="package" class="nav-icon"></i>
+                    <span class="nav-text">Ingredientes</span>
+                </a>
+                <a href="#" class="nav-item" data-section="inventory">
+                    <i data-lucide="warehouse" class="nav-icon"></i>
+                    <span class="nav-text">Inventario</span>
+                </a>
+
+                <p class="nav-section-label">Reportes</p>
+                <a href="#" class="nav-item" data-section="statistics">
+                    <i data-lucide="bar-chart-3" class="nav-icon"></i>
+                    <span class="nav-text">Estadísticas</span>
+                </a>
+                <a href="#" class="nav-item" data-section="settings">
+                    <i data-lucide="settings" class="nav-icon"></i>
+                    <span class="nav-text">Configuración</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <span>Hecho con amor para mi reposterita hermosa🩷</span>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <button class="mobile-menu-btn" id="sidebarToggle" aria-label="Abrir menú">
+                        <img src="logo.png" alt="Menú" class="menu-logo-img">
+                    </button>
+                    <div class="header-title">
+                        <h2 id="sectionTitle">Dashboard</h2>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <span class="date-display" id="dateDisplay"></span>
+                </div>
+            </header>
+
+            <!-- Sections -->
+            <section class="section active" id="dashboard">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i data-lucide="dollar-sign"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Costo Promedio</h3>
+                            <p class="stat-value" id="avgCost">$0.00</p>
+                            <span class="stat-label">por postre</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i data-lucide="tag"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Precio Promedio</h3>
+                            <p class="stat-value" id="avgPrice">$0.00</p>
+                            <span class="stat-label">de venta</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i data-lucide="trending-up"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Ganancia Estimada</h3>
+                            <p class="stat-value" id="avgProfit">$0.00</p>
+                            <span class="stat-label">por postre</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i data-lucide="clipboard-list"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Recetas</h3>
+                            <p class="stat-value" id="totalRecipes">0</p>
+                            <span class="stat-label">registradas</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>Distribución de Costos</h3>
+                        <canvas id="costDistributionChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Ingredientes Más Caros</h3>
+                        <canvas id="expensiveIngredientsChart"></canvas>
+                    </div>
+                    <div class="chart-card full-width">
+                        <h3>Ganancia por Postre</h3>
+                        <canvas id="profitByDessertChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="quoter">
+                <div class="quoter-container">
+                    <div class="form-group">
+                        <label>Seleccionar Postre</label>
+                        <select id="quoterDessert" class="form-select">
+                            <option value="">-- Seleccionar --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Receta</label>
+                        <select id="quoterRecipe" class="form-select">
+                            <option value="">-- Seleccionar receta --</option>
+                        </select>
+                    </div>
+
+                    <div class="ingredients-table-container">
+                        <table class="data-table" id="quoterTable">
+                            <thead>
+                                <tr>
+                                    <th>Ingrediente</th>
+                                    <th>Cantidad</th>
+                                    <th>Unidad</th>
+                                    <th>Precio Unitario</th>
+                                    <th>Costo</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="quoterTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="quoter-actions" style="margin-top: 16px; margin-bottom: 24px;">
+                        <button class="btn btn-primary" id="openAddIngredientModalBtn">Agregar Ingrediente</button>
+                    </div>
+
+                    <div class="quoter-summary">
+                        <div class="summary-card">
+                            <h3>Costo Total</h3>
+                            <p class="summary-value" id="totalCost">$0.00</p>
+                        </div>
+                        <div class="summary-card">
+                            <h3>Margen de Ganancia</h3>
+                            <p class="summary-value" id="profitMargin">0%</p>
+                        </div>
+                        <div class="summary-card">
+                            <h3>Precio Sugerido</h3>
+                            <p class="summary-value" id="suggestedPrice">$0.00</p>
+                        </div>
+                    </div>
+
+                    <div class="quoter-actions">
+                        <button class="btn btn-primary" id="calculateBtn">Calcular</button>
+                        <button class="btn btn-success" id="exportPdfBtn">Exportar PDF</button>
+                        <button class="btn btn-secondary" id="saveRecipeBtn">Guardar Receta</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="recipes">
+                <div class="section-header">
+                    <h3>Gestión de Recetas</h3>
+                    <button class="btn btn-primary" id="addRecipeBtn">Nueva Receta</button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table" id="recipesTable">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Postre</th>
+                                <th>Ingredientes</th>
+                                <th>Costo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recipesTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="section" id="ingredients">
+                <div class="section-header">
+                    <h3>Ingredientes y Precios</h3>
+                    <button class="btn btn-primary" id="addIngredientBtn">Nuevo Ingrediente</button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table" id="ingredientsTable">
+                        <thead>
+                            <tr>
+                                <th>Ingrediente</th>
+                                <th>Unidad Base</th>
+                                <th>Precio Unitario</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ingredientsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="section" id="inventory">
+                <div class="section-header">
+                    <h3>Inventario</h3>
+                    <button class="btn btn-primary" id="updateInventoryBtn">Actualizar Inventario</button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table" id="inventoryTable">
+                        <thead>
+                            <tr>
+                                <th>Ingrediente</th>
+                                <th>Cantidad Disponible</th>
+                                <th>Unidad</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="section" id="statistics">
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>Costo por Postre</h3>
+                        <canvas id="costByDessertChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Ingredientes Más Usados</h3>
+                        <canvas id="mostUsedIngredientsChart"></canvas>
+                    </div>
+                    <div class="chart-card full-width">
+                        <h3>Ganancia Estimada Total</h3>
+                        <canvas id="totalProfitChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="settings">
+                <div class="settings-container">
+                    <div class="form-group">
+                        <label>Margen de Ganancia Global (%)</label>
+                        <input type="number" id="globalMargin" class="form-input" value="50" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Moneda</label>
+                        <select id="currency" class="form-select">
+                            <option value="MXN">MXN - Peso Mexicano</option>
+                            <option value="USD">USD - Dólar Americano</option>
+                            <option value="EUR">EUR - Euro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Impuestos (%)</label>
+                        <input type="number" id="taxRate" class="form-input" value="16" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Alerta de Bajo Inventario (unidades)</label>
+                        <input type="number" id="lowStockAlert" class="form-input" value="5" min="0">
+                    </div>
+                    <button class="btn btn-primary" id="saveSettingsBtn">Guardar Configuración</button>
+                    <button class="btn btn-danger" id="resetDataBtn">Restaurar Datos</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <span class="modal-close" id="modalClose">&times;</span>
+            <h3 id="modalTitle">Modal</h3>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+
+    
+</body>
+</html>
